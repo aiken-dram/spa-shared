@@ -4,11 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>SPA.Shared.Domain</PackageId>
-    <Build>1</Build>
-    <VersionPrefix>6.0.0.$(Build)</VersionPrefix>
+    
+    <OutputPath>..\packages\Application\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
+    <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj"/>
   </ItemGroup>
 
 </Project>

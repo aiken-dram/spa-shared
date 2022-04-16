@@ -5,16 +5,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>SPA.Shared.Domain</PackageId>
-    <Build>1</Build>
-    <VersionPrefix>6.0.0.$(Build)</VersionPrefix>
+    <OutputPath>..\packages\Infrastructure\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.4" />
     <PackageReference Include="NPOI" Version="2.5.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
+    <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
   </ItemGroup>
 
 </Project>

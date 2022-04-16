@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Shared.Domain.Interfaces;
 
 namespace Shared.Application.Extensions;
 
@@ -117,39 +116,6 @@ public static class DbSetExtensions
         }
 
         return new Tuple<string, string>(oldDict, newDict);
-    }
-
-
-    /// <summary>
-    /// Returns id of type from dictionary by providing type name
-    /// </summary>
-    /// <param name="source">Db set of dictionary</param>
-    /// <param name="dict">Type name</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Id of type</returns>
-    public static async Task<long> DictionaryTypeAsync<TSource>(this DbSet<TSource> source,
-        string dict,
-        CancellationToken cancellationToken)
-        where TSource : class, IDictionaryType
-    {
-        var d = await source.FirstAsync(p => p.Type == dict, cancellationToken);
-        return d.IdType;
-    }
-
-    /// <summary>
-    /// Returns id of state from dictionary by providing state name
-    /// </summary>
-    /// <param name="source">Db set of dictionary</param>
-    /// <param name="dict">State name</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Id of state</returns>
-    public static async Task<long> DictionaryStateAsync<TSource>(this DbSet<TSource> source,
-        string dict,
-        CancellationToken cancellationToken)
-        where TSource : class, IDictionaryState
-    {
-        var d = await source.FirstAsync(p => p.State == dict, cancellationToken);
-        return d.IdState;
     }
 
     /// <summary>

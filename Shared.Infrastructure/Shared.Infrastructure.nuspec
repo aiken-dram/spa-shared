@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>SPA.Shared.Application</id>
+    <id>SPA.Shared.Infrastructure</id>
     <version>6.0.3</version>
     <title>$title$</title>
     <authors>Aiken Drum</authors>
     <owners>Aiken Drum</owners>
-    <description>Shared dotnet library for application layer in SPA backend solutions</description>
+    <description>Shared dotnet library for infrastructure layer in SPA backend solutions</description>
     <dependencies>
       <group targetFramework="net6.0" />
     </dependencies>

@@ -29,3 +29,7 @@ Push nuget package into local source:
 ```sh
 dotnet nuget push SPA.Shared.Domain.nupkg --source \\local\packages
 ```
+
+```
+dotnet pack -c Release -p:NuspecFile=JOS.MyNugetPackage.Client2.nuspec
+```

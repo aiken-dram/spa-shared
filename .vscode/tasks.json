@@ -40,10 +40,8 @@
     {
       "label": "package domain",
       "type": "shell",
-      "command": "./.scripts/package_domain.sh",
-      "windows": {
-        "command": ".\\.scripts\\package_domain.cmd"
-      },
+      "command": ".\\.scripts\\package_domain.cmd",
+      "args": ["${env:DOMAIN_BUILD}"],
       "group": "none",
       "presentation": {
         "reveal": "always",
@@ -53,10 +51,8 @@
     {
       "label": "package application",
       "type": "shell",
-      "command": "./.scripts/package_application.sh",
-      "windows": {
-        "command": ".\\.scripts\\package_application.cmd"
-      },
+      "command": ".\\.scripts\\package_application.cmd",
+      "args": ["${env:APPLICATION_BUILD}"],
       "group": "none",
       "presentation": {
         "reveal": "always",
@@ -66,10 +62,8 @@
     {
       "label": "package infrastructure",
       "type": "shell",
-      "command": "./.scripts/package_infrastructure.sh",
-      "windows": {
-        "command": ".\\.scripts\\package_infrastructure.cmd"
-      },
+      "command": ".\\.scripts\\package_infrastructure.cmd",
+      "args": ["${env:INFRASTRUCTURE_BUILD}"],
       "group": "none",
       "presentation": {
         "reveal": "always",
