@@ -24,13 +24,13 @@ public class FileVm
     /// Name of file
     /// </summary>
     /// <example>export.csv</example>
-    public string? FileName { get; set; }
+    public string FileName { get; set; } = null!;
 
     /// <summary>
     /// Type of file
     /// </summary>
     /// <example>text/csv</example>
-    public string? ContentType { get; set; }
+    public string ContentType { get; set; } = null!;
 
     /// <summary>
     /// Byte content of file
