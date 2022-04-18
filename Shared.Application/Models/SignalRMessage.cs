@@ -8,22 +8,27 @@ public class SignalRMessageDto
     /// <summary>
     /// From
     /// </summary>
-    public string? From { get; set; }
+    public string From { get; set; } = null!;
 
     /// <summary>
     /// To
     /// </summary>
-    public string? To { get; set; }
+    public string To { get; set; } = null!;
 
     /// <summary>
     /// Subject
     /// </summary>
-    public string? Subject { get; set; }
+    public string Subject { get; set; } = null!;
 
     /// <summary>
     /// Body
     /// </summary>
     public object? Body { get; set; }
+
+    /// <summary>
+    /// Progress bar stage (0-100)
+    /// </summary>
+    public int? Bar { get; set; }
 
     /// <summary>
     /// Empty constructor
@@ -40,11 +45,13 @@ public class SignalRMessageDto
     /// <param name="to">To</param>
     /// <param name="subject">Subject</param>
     /// <param name="body">Body</param>
-    public SignalRMessageDto(string from, string to, string subject, object body)
+    /// <param name="bar">Progress bar value</param>
+    public SignalRMessageDto(string from, string to, string subject, object body, int? bar = null)
     {
         From = from;
         To = to;
         Subject = subject;
         Body = body;
+        Bar = bar;
     }
 }
