@@ -4,7 +4,7 @@ Common library for backend dotnet core solution in [SPA template](https://github
 
 ## Building packages
 
-Project uses machine environmental variable `SPA_SHARED_BUILD` for build version
+Project uses environmental variable `SPA_SHARED_BUILD` for build version
 
 VS Code tasks.json has two tasks:
 
