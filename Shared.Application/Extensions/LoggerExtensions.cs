@@ -14,7 +14,7 @@ public static class LoggerExtensions
     /// <param name="logger">logger</param>
     /// <param name="message">name of object</param>
     /// <param name="json">object to generate json for</param>
-    public static void JsonLogDebug(this ILogger logger, string message, object json)
+    public static void JsonLogDebug(this ILogger logger, string? message, object? json)
     {
         logger.LogDebug("{0}: {1}", message, JsonConvert.SerializeObject(json, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
     }

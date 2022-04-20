@@ -12,7 +12,7 @@ public static class ListHelper
     /// <param name="list">provided list</param>
     /// <param name="existing">existing list</param>
     /// <returns>list to be added to dbcontext</returns>
-    public static IEnumerable<long>? AddList(long? requestId, long[] list, List<long> existing)
+    public static IEnumerable<long>? AddList(long? requestId, long[]? list, List<long>? existing)
     {
         if (requestId.HasValue)
         {
@@ -49,7 +49,7 @@ public static class ListHelper
     /// <param name="list">provided list</param>
     /// <param name="existing">existing list</param>
     /// <returns>list to be removed from dbcontext</returns>
-    public static IEnumerable<long>? RemoveList(long? requestId, long[] list, List<long> existing)
+    public static IEnumerable<long>? RemoveList(long? requestId, long[]? list, List<long>? existing)
     {
         if (requestId.HasValue)
         {

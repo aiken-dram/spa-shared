@@ -6,10 +6,9 @@
     <Nullable>enable</Nullable>   
 
     <PackageId>SPA.Shared.Domain</PackageId>
-    <Build>3</Build>
-    <VersionPrefix>6.0.$(Build)</VersionPrefix>
-    <OutputPath>..\packages\Domain\</OutputPath>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <VersionPrefix>6.0.$(SPA_SHARED_BUILD)</VersionPrefix>
+    <OutputPath>..\packages\domain\</OutputPath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile> 
   </PropertyGroup>
 
 </Project>

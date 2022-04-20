@@ -1,74 +1,61 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/Tests/Shared.Application.UnitTests/Shared.Application.UnitTests.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "publish",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "publish",
-        "${workspaceFolder}/Tests/Shared.Application.UnitTests/Shared.Application.UnitTests.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "watch",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "watch",
-        "run",
-        "--project",
-        "${workspaceFolder}/Tests/Shared.Application.UnitTests/Shared.Application.UnitTests.csproj"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "package domain",
-      "type": "shell",
-      "command": ".\\.scripts\\package_domain.cmd",
-      "args": ["${env:DOMAIN_BUILD}"],
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    },
-    {
-      "label": "package application",
-      "type": "shell",
-      "command": ".\\.scripts\\package_application.cmd",
-      "args": ["${env:APPLICATION_BUILD}"],
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    },
-    {
-      "label": "package infrastructure",
-      "type": "shell",
-      "command": ".\\.scripts\\package_infrastructure.cmd",
-      "args": ["${env:INFRASTRUCTURE_BUILD}"],
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Tests/Shared.Domain.UnitTests/Shared.Domain.UnitTests.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/Tests/Shared.Domain.UnitTests/Shared.Domain.UnitTests.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/Tests/Shared.Domain.UnitTests/Shared.Domain.UnitTests.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build packages",
+            "type": "shell",
+            "command": ".\\.scripts\\build.ps1",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "reset build version",
+            "type": "shell",
+            "command": ".\\.scripts\\reset.ps1",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
 }

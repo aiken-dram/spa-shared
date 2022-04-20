@@ -16,7 +16,7 @@ public static class TableExtensions
     /// <param name="filters">list of table filters</param>
     /// <typeparam name="TSource">entity</typeparam>
     /// <returns>query with applied filters</returns>
-    public static IQueryable<TSource> Filters<TSource>(this IQueryable<TSource> source, IEnumerable<TableFilter> filters)
+    public static IQueryable<TSource> Filters<TSource>(this IQueryable<TSource> source, IEnumerable<TableFilter>? filters)
         where TSource : class
     {
         if (filters != null)
@@ -44,7 +44,7 @@ public static class TableExtensions
     /// <typeparam name="TSource">entity</typeparam>
     /// <typeparam name="TRaion">type of array</typeparam>
     /// <returns>query with applied field in array</returns>
-    public static IQueryable<TSource> FilterRaion<TSource, TRaion>(this IQueryable<TSource> source, string Field, IList<TRaion> array, bool UseEmptyAsAll = true)
+    public static IQueryable<TSource> FilterRaion<TSource, TRaion>(this IQueryable<TSource> source, string Field, IList<TRaion>? array, bool UseEmptyAsAll = true)
         where TSource : class
     {
         if (array != null && array.Count > 0)

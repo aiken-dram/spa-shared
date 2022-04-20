@@ -35,5 +35,5 @@ public class FileVm
     /// <summary>
     /// Byte content of file
     /// </summary>
-    public byte[]? Content { get; set; }
+    public byte[] Content { get; set; } = null!;
 }

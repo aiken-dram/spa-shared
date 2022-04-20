@@ -57,7 +57,7 @@ public class TableFilter
     /// </summary>
     /// <param name="filters">List of filter strings</param>
     /// <returns>List of TableFilter</returns>
-    public static IEnumerable<TableFilter> ToFilterList(IList<string> filters)
+    public static IEnumerable<TableFilter> ToFilterList(IList<string>? filters)
     {
         var res = new List<TableFilter>();
         if (filters != null && filters.Count > 0)
