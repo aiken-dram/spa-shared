@@ -34,6 +34,10 @@ public static class Messages
     /// </summary>
     public const string DateTimeFormat = "dd.MM.yyyy";
     /// <summary>
+    /// Timestamp format
+    /// </summary>
+    public const string TimestampFormat = "dd.MM.yyyy hh:mm:ss";
+    /// <summary>
     /// Currency symbol
     /// </summary>
     public const string Currency = "р.";
