@@ -13,7 +13,7 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// 
+    /// Not sure where i used it, yare yare
     /// </summary>
     /// <param name="query"></param>
     /// <param name="propertyName"></param>

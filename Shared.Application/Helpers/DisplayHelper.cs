@@ -9,21 +9,16 @@ namespace Shared.Application.Helpers;
 public static class DisplayHelper
 {
     /// <summary>
-    /// 
+    /// Display DateTime value with DateTimeFormat
     /// </summary>
     /// <param name="val"></param>
     /// <returns></returns>
-    public static string ToString(DateTime val)
-    { return val.ToString(Messages.DateTimeFormat); }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="val"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string ToString(DateTime? val, string NullValue = Messages.NullValue)
-    { return (val.HasValue) ? ToString(val.Value) : NullValue; }
+    public static string ToString(DateTime val, string format = Messages.DateTimeFormat, bool isTimeStamp = false)
+    {
+        if (format == Messages.DateTimeFormat && isTimeStamp)
+            format = Messages.TimestampFormat;
+        return val.ToString(format);
+    }
 
     /// <summary>
     /// 

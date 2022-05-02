@@ -8,17 +8,17 @@ public class SignalRMessageDto
     /// <summary>
     /// From
     /// </summary>
-    public string? From { get; set; }
+    public string From { get; set; } = null!;
 
     /// <summary>
     /// To
     /// </summary>
-    public string? To { get; set; }
+    public string To { get; set; } = null!;
 
     /// <summary>
     /// Subject
     /// </summary>
-    public string? Subject { get; set; }
+    public string Subject { get; set; } = null!;
 
     /// <summary>
     /// Body
