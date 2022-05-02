@@ -26,6 +26,14 @@ public static class Messages
     /// </summary>
     public const string NullValue = "missing";
     /// <summary>
+    /// Text to be displayed in case of char boolean true value
+    /// </summary>
+    public const string CharBooleanTrue = "true";
+    /// <summary>
+    /// Text to be displayed in case of char boolean false value
+    /// </summary>
+    public const string CharBooleanFalse = "false";
+    /// <summary>
     /// Culture info
     /// </summary>
     public const string CultureInfo = "ru-RU";
