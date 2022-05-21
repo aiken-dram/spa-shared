@@ -1,12 +1,12 @@
 namespace Shared.Domain.Interfaces;
 
 /// <summary>
-/// Interface for audit event
+/// Interface for audit log
 /// </summary>
-public interface IAuditEvent
+public interface IAudit
 {
     /// <summary>
-    /// Date and time of event
+    /// Date and time of audit
     /// </summary>
     DateTime Stamp { get; set; }
 
@@ -36,20 +36,20 @@ public interface IAuditEvent
     string? TargetName { get; set; }
 
     /// <summary>
-    /// Event message
+    /// Audit message
     /// </summary>
     string? Message { get; set; }
 
     /// <summary>
-    /// Event data
+    /// Audit data
     /// </summary>
-    List<IAuditEventData> EventData { get; set; }
+    List<IAuditData> AuditData { get; set; }
 }
 
 /// <summary>
-/// Interface for audit event data
+/// Interface for audit log data
 /// </summary>
-public interface IAuditEventData
+public interface IAuditData
 {
     /// <summary>
     /// Id of data type

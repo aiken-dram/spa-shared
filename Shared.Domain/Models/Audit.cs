@@ -3,9 +3,9 @@ using Shared.Domain.Interfaces;
 namespace Shared.Domain.Models;
 
 /// <summary>
-/// Audit event
+/// Audit log
 /// </summary>
-public class AuditEvent : IAuditEvent
+public class Audit : IAudit
 {
     /// <summary>
     /// Has been logged
@@ -49,9 +49,9 @@ public class AuditEvent : IAuditEvent
     public string? Message { get; set; }
 
     /// <summary>
-    /// Event data
+    /// Audit data
     /// </summary>
-    public List<IAuditEventData> EventData { get; set; }
+    public List<IAuditData> AuditData { get; set; }
     #endregion
 
     /// <summary>
@@ -62,7 +62,7 @@ public class AuditEvent : IAuditEvent
     /// <param name="targetId">Target id</param>
     /// <param name="targetName">Target name</param>
     /// <param name="message">Message</param>
-    public AuditEvent(int idTarget, int idAction, long? targetId, string? targetName, string? message)
+    public Audit(int idTarget, int idAction, long? targetId, string? targetName, string? message)
     {
         IsLogged = false;
         Stamp = DateTime.Now;
@@ -71,50 +71,48 @@ public class AuditEvent : IAuditEvent
         TargetId = targetId;
         TargetName = targetName;
         Message = message;
-        EventData = new List<IAuditEventData>();
+        AuditData = new List<IAuditData>();
     }
 
     /// <summary>
-    /// Constructor from AuditableEntity, 
+    /// Constructor from AuditableEntity
     /// </summary>
     /// <param name="entity">AuditableEntity</param>
     /// <param name="idAction">Id of action in dictionary</param>
     /// <param name="message">Message</param>
-    public AuditEvent(AuditableEntity entity, int idAction, string? message)
+    public Audit(AuditableEntity entity, int idAction, string? message)
     : this(entity.AuditIdTarget, idAction, entity.AuditTargetId, entity.AuditTargetName, message)
     {
 
     }
 
-
-
     /// <summary>
-    /// Add range of AuditEventData
+    /// Add range of AuditData
     /// </summary>
-    /// <param name="list">List of AuditEventData</param>
-    public void AddRange(IList<AuditEventData> list)
+    /// <param name="list">List of AuditData</param>
+    public void AddRange(IList<AuditData> list)
     {
-        EventData.AddRange(list);
+        AuditData.AddRange(list);
     }
 
     /// <summary>
-    /// Adds a single AuditEventData, if AuditEventData is not null
+    /// Adds a single AuditData, if AuditData is not null
     /// </summary>
-    /// <param name="data">Nullable AuditEventData</param>
-    public void Add(AuditEventData? data)
+    /// <param name="data">Nullable AuditData</param>
+    public void Add(AuditData? data)
     {
         if (data != null)
-            EventData.Add(data);
+            AuditData.Add(data);
     }
 }
 
 /// <summary>
-/// Audit event data
+/// Audit log data
 /// </summary>
-public class AuditEventData : IAuditEventData
+public class AuditData : IAuditData
 {
     /// <summary>
-    /// Id of event data type in dictionary
+    /// Id of audit data type in dictionary
     /// </summary>
     public int IdType { get; set; }
 
@@ -128,7 +126,7 @@ public class AuditEventData : IAuditEventData
     /// </summary>
     /// <param name="idType">Id of type in dictionary</param>
     /// <param name="json">JSON with data parameters</param>
-    public AuditEventData(int idType, string json)
+    public AuditData(int idType, string json)
     {
         IdType = idType;
         Json = json;

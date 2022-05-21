@@ -6,6 +6,7 @@ namespace Shared.Application.Helpers;
 
 /// <summary>
 /// Static class for working with history of editing entity values
+/// OBSOLETE once i switch to AuditEvent system
 /// </summary>
 public static class HistoryHelper
 {

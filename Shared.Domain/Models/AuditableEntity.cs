@@ -6,15 +6,15 @@ namespace Shared.Domain.Models;
 public abstract class AuditableEntity
 {
     /// <summary>
-    /// Events to be logged in database
+    /// List of audit to be logged in database
     /// </summary>
-    public List<AuditEvent> AuditEvents { get; set; } = new List<AuditEvent>();
+    public List<Audit> Audits { get; set; } = new List<Audit>();
 
     /// <summary>
-    /// Add audit event to event log
+    /// Add audit to list
     /// </summary>
-    /// <param name="e"></param>
-    public void Log(AuditEvent e) => AuditEvents.Add(e);
+    /// <param name="e">Audit</param>
+    public void Log(Audit e) => Audits.Add(e);
 
     /// <summary>
     /// Id of target in dictionary to be saved in AuditEvent

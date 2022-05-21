@@ -4,12 +4,13 @@ using NPOI.SS.UserModel;
 namespace Shared.Infrastructure.Helpers;
 
 //THIS IS WIP
-/*internal class Sample
+//How i want this to work:
+internal class Sample
 {
     public class SampleDto
     {
         public int Number { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public DateTime? Date { get; set; }
     }
 
@@ -29,27 +30,27 @@ namespace Shared.Infrastructure.Helpers;
         var excel = new Excel(wb, sh);
 
         //date in string format
-        excel.Cell(0, 0).Write($"{DateTime.Now:dd.MM.yyyy}"); //done
+        excel.Cell(0, 0).Write($"{DateTime.Now:dd.MM.yyyy}"); //maybe switch to indexes, like Cells[0,1]?
 
         //title
-        excel.Cell(1, 2).Write("Title"); //done
+        excel.Cell(1, 2).Write("Title");
 
         //records
         foreach (var r in records)
         {
-            var row = excel.AddRow(); //done
+            var row = excel.AddRow();
 
             //Number - 1
-            row.Add(r.Number); //done
+            row.Add(r.Number);
 
             //Text - 2
-            row.Add(r.Text); //done
+            row.Add(r.Text);
 
             //empty column 
-            row.Add(); //done
+            row.Add();
 
             //birth date - 3
-            row.Add(r.Date); //done
+            row.Add(r.Date);
         }
 
         //2D alternatively, use predefined mapping
@@ -59,7 +60,7 @@ namespace Shared.Infrastructure.Helpers;
         if (count > 60000)
             excel.AddRow().Add($"Number of records exceeded maximum allowed number of rows in Excel. Only first 60000 from {count.ToString()} total records were saved.");
     }
-}*/
+}
 
 /// <summary>
 /// Helper class to work with Excel spreadsheet
