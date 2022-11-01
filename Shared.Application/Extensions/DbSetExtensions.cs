@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Shared.Application.Exceptions;
+using Shared.Application.Helpers;
 using System.Linq.Expressions;
 
 namespace Shared.Application.Extensions;
@@ -129,4 +131,68 @@ public static class DbSetExtensions
     public static ValueTask<TSource?> FindIdAsync<TSource>(this DbSet<TSource> source, object? key, CancellationToken cancellationToken)
         where TSource : class
         => source.FindAsync(new object?[] { key }, cancellationToken);
+
+
+    /// <summary>
+    /// Searches dbSet by id and returns entity or throws NotFoundException
+    /// </summary>
+    /// <param name="dbSet">this DbSet</param>
+    /// <param name="key">object key</param>
+    /// <param name="cancellationToken"></param>
+    /// <typeparam name="TEntity">Type of dbset</typeparam>
+    /// <returns>Entity</returns>
+    public static async Task<TEntity> GetAsync<TEntity>(this DbSet<TEntity> dbSet, object key, CancellationToken cancellationToken)
+        where TEntity : class
+    {
+        var res = await dbSet.FindIdAsync(key, cancellationToken);
+
+        if (res == null)
+            throw new NotFoundException(DisplayHelper.GetDisplayName<TEntity>(), key);
+
+        return res;
+    }
+
+    /// <summary>
+    /// Updates collection of children for parent entity
+    /// </summary>
+    /// <typeparam name="T">Type of child entity</typeparam>
+    /// <typeparam name="R">Type of child update request</typeparam>
+    /// <param name="dbset">DbSet of child entity</param>
+    /// <param name="entity">Collection of child entity in parent</param>
+    /// <param name="request">Enumerable of child update request</param>
+    /// <param name="eUpdate">Action for updating child entity with request values</param>
+    /// <param name="eCreate">Action for creating new child entity from request values</param>
+    /// <param name="rSelect">Function for making predicate for comparing child and request values</param>
+    /// <param name="predNew">Function for selecting update requests of creating new child</param>
+    public static void UpdateCollection<T, R>(
+        this DbSet<T> dbset,
+        ICollection<T> entity,
+        IEnumerable<R> request,
+        Action<T, R> eUpdate,
+        Func<R, T> eCreate,
+        Func<T, Func<R, bool>> rSelect,
+        Func<R, bool> predNew)
+        where T : class
+    {
+        // update or delete existing elements
+        foreach (var e in entity)
+        {
+            if (request.Any(rSelect(e)))
+            {
+                //update
+                var r = request.First(rSelect(e));
+                eUpdate(e, r);
+            }
+            else
+            {
+                //delete from list and database
+                entity.Remove(e);
+                dbset.Remove(e);
+            }
+        }
+
+        // add new params
+        foreach (var r in request.Where(predNew))
+            entity.Add(eCreate(r));
+    }
 }

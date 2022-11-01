@@ -3,6 +3,12 @@ using NPOI.SS.UserModel;
 
 namespace Shared.Infrastructure.Helpers;
 
+/*
+* since i switched to R for statistics, this helper wont be as necessary i think
+* only in case some internal reports?
+* 
+*/
+
 //THIS IS WIP
 //How i want this to work:
 internal class Sample

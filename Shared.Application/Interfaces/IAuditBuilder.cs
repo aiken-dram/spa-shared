@@ -30,7 +30,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="message">Message</param>
     /// <returns>Audit</returns>
-    Task<Audit> Create<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
+    Task<Audit> CreateAsync<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
         where TEntity : AuditableEntity;
 
     /// <summary>
@@ -39,7 +39,7 @@ public interface IAuditBuilder
     /// <param name="entry">Entity</param>
     /// <typeparam name="TEntity">Type of entity</typeparam>
     /// <returns>Audit</returns>
-    Task<Audit> Create<TEntity>(EntityEntry<TEntity> entry)
+    Task<Audit> CreateAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : AuditableEntity;
 
     /// <summary>
@@ -59,7 +59,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="message">Message</param>
     /// <returns>Audit</returns>
-    Task<Audit> Edit<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
+    Task<Audit> EditAsync<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
         where TEntity : AuditableEntity;
 
     /// <summary>
@@ -68,7 +68,7 @@ public interface IAuditBuilder
     /// <param name="entry">Entity</param>
     /// <typeparam name="TEntity">Type of entity</typeparam>
     /// <returns>Audit</returns>
-    Task<Audit> Edit<TEntity>(EntityEntry<TEntity> entry)
+    Task<Audit> EditAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : AuditableEntity;
 
     /// <summary>
@@ -97,7 +97,7 @@ public interface IAuditBuilder
     /// <typeparam name="TEntity">Entity type</typeparam>
     /// <param name="entity">Entity object</param>
     /// <returns>List of AuditData</returns>
-    Task<List<AuditData>> EntityData<TEntity>(TEntity entity);
+    Task<List<AuditData>> EntityDataAsync<TEntity>(TEntity entity);
 
     /// <summary>
     /// Generate list of AuditData with json from object from expression
@@ -119,7 +119,7 @@ public interface IAuditBuilder
     /// <param name="entity">Entity object</param>
     /// <param name="request">Request object</param>
     /// <returns>List of AuditData</returns>
-    Task<List<AuditData>> EntityEdit<TEntity, TRequest>(TEntity entity, TRequest request);
+    Task<List<AuditData>> EntityEditAsync<TEntity, TRequest>(TEntity entity, TRequest request);
 
     /// <summary>
     /// Generate list of AuditData for creating new entity for properties with [Audit] attributes
@@ -130,7 +130,7 @@ public interface IAuditBuilder
     /// <param name="entity">Entity object</param>
     /// <param name="request">Request object</param>
     /// <returns>List of AuditData</returns>
-    Task<List<AuditData>> EntityCreate<TEntity, TRequest>(TEntity entity, TRequest request);
+    Task<List<AuditData>> EntityCreateAsync<TEntity, TRequest>(TEntity entity, TRequest request);
     #endregion
 
     #region AUDIT DATA
@@ -168,6 +168,15 @@ public interface IAuditBuilder
     AuditData DataFieldOldNew(string field, string oldVal, string newVal);
 
     /// <summary>
+    /// AuditData with FieldOperationValue type and { Field: "field", Operation: "operation", Value: "value" } json
+    /// </summary>
+    /// <param name="field">Field</param>
+    /// <param name="operation">Operation</param>
+    /// <param name="value">Value</param>
+    /// <returns>AuditData</returns>
+    AuditData DataFieldOperationValue(string field, string operation, string value);
+
+    /// <summary>
     /// Audit event data for creating entity with values from request
     /// </summary>
     /// <typeparam name="TEntity">Entity type</typeparam>
@@ -176,7 +185,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="property">Property</param>
     /// <returns>EventDataFieldValue or null</returns>
-    Task<AuditData?> PropertyCreate<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property);
+    Task<AuditData?> PropertyCreateAsync<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property);
 
     /// <summary>
     /// Audit event data for creating entity with values from request of property from expression
@@ -188,7 +197,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="propertyExpression">Property expression</param>
     /// <returns>AuditData or null</returns>
-    Task<AuditData?> PropertyCreate<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression);
+    Task<AuditData?> PropertyCreateAsync<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression);
 
     /// <summary>
     /// AuditData if property has changed from entity to request, otherwise null
@@ -199,7 +208,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="property">PropertyInfo in entity</param>
     /// <returns>AuditData or null</returns>
-    Task<AuditData?> PropertyEdit<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property);
+    Task<AuditData?> PropertyEditAsync<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property);
 
     /// <summary>
     /// AuditData if property from expression has changed from entity to request, otherwise null
@@ -211,7 +220,7 @@ public interface IAuditBuilder
     /// <param name="request">Request</param>
     /// <param name="propertyExpression">Property expression</param>
     /// <returns>AuditData or null</returns>
-    Task<AuditData?> PropertyEdit<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression);
+    Task<AuditData?> PropertyEditAsync<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression);
 
     /// <summary>
     /// AuditData with value of property
@@ -220,7 +229,7 @@ public interface IAuditBuilder
     /// <param name="entity">Entity</param>
     /// <param name="property">PropertyInfo in entity</param>
     /// <returns>AuditData</returns>
-    Task<AuditData> PropertyValue<TEntity>(TEntity entity, PropertyInfo property);
+    Task<AuditData> PropertyValueAsync<TEntity>(TEntity entity, PropertyInfo property);
 
     /// <summary>
     /// AuditData with value of property from expression
@@ -230,7 +239,7 @@ public interface IAuditBuilder
     /// <param name="entity">Entity</param>
     /// <param name="propertyExpression">Property expression</param>
     /// <returns>AuditData</returns>
-    Task<AuditData> PropertyValue<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression);
+    Task<AuditData> PropertyValueAsync<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression);
     #endregion
 
     #region PROPERTY VALUE
@@ -239,7 +248,7 @@ public interface IAuditBuilder
     /// </summary>
     /// <param name="dictionary">Name of dictionary</param>
     /// <returns>Dictionary content</returns>
-    Task<Dictionary<object, string?>> GetDictionary(string dictionary);
+    Task<Dictionary<long, string?>> GetDictionaryAsync(string dictionary);
 
     /// <summary>
     /// Returns string value of property object based on [Audit] attribute
@@ -247,7 +256,7 @@ public interface IAuditBuilder
     /// <param name="val">Value object</param>
     /// <param name="attr">AuditAttribute</param>
     /// <returns>String value to store in audit event</returns>
-    Task<string> PropertyToString(object? val, AuditAttribute attr);
+    Task<string> PropertyToStringAsync(object? val, AuditAttribute attr);
 
     /// <summary>
     /// Property value from dictionary
@@ -255,6 +264,6 @@ public interface IAuditBuilder
     /// <param name="val">Id in dictionary</param>
     /// <param name="dictionary">Dictionary name</param>
     /// <returns>Text from dictionary</returns>
-    Task<string> PropertyDictionaryValue(object val, string dictionary);
+    Task<string> PropertyDictionaryValueAsync(object val, string dictionary);
     #endregion
 }

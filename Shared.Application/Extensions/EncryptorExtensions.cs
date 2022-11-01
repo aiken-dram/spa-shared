@@ -1,19 +1,16 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Shared.Application.Helpers;
+namespace Shared.Application.Extensions;
 
-/// <summary>
-/// Static class for working with encryption
-/// </summary>
-public static class EncryptorHelper
+public static class EncryptorExtensions
 {
     /// <summary>
     /// Generates MD5 hash for text
     /// </summary>
     /// <param name="text">text</param>
     /// <returns>MD5 hash</returns>
-    public static string? MD5Hash(string text)
+    public static string? MD5Hash(this string text)
     {
         var md5 = MD5.Create();
         md5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(text));

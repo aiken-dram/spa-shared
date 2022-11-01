@@ -109,6 +109,13 @@ public class TableQuery
 public class ListVm<T>
     where T : class
 {
+    public ListVm() { }
+
+    public ListVm(IList<T>? items)
+    {
+        Items = items;
+    }
+
     /// <summary>
     /// List of requested items from database
     /// </summary>
@@ -122,6 +129,14 @@ public class ListVm<T>
 public class TableVm<T>
     where T : class
 {
+    public TableVm() { }
+
+    public TableVm(IList<T>? items, long? total)
+    {
+        Items = items;
+        Total = total;
+    }
+
     /// <summary>
     /// List of requested items from database
     /// </summary>

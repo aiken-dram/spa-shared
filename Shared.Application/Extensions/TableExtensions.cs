@@ -28,7 +28,7 @@ public static class TableExtensions
                     !(p.Operator == "in" && p.Value == "null"));
 
             if (validFilters != null && validFilters.Count() > 0)
-                source = source.Where(ExpressionHelper.BuildPredicates<TSource>(validFilters));
+                source = source.Where(validFilters.BuildPredicates<TSource>());
         }
 
         return source;
@@ -70,6 +70,7 @@ public static class TableExtensions
     public static IQueryable<TSource> TableQuery<TSource>(this IQueryable<TSource> source, TableQuery table, string DefaultSort, bool DefaultSortDesc = false)
         where TSource : class
     {
+        string tag = "TABLE";
         //Ordering
         if (string.IsNullOrEmpty(table.SortBy))
         {
@@ -89,9 +90,15 @@ public static class TableExtensions
 
         //Pagination
         if (table.Page == 1)
+        {
             //tagging is for fixing fetch first error in old DB version (9.8) with DB9 command interceptor
-            return source.Take(table.ItemsPerPage).TagWith($"FIRST PAGE TABLE N{table.ItemsPerPage}");
+            tag += $" FIRST PAGE N{table.ItemsPerPage}ROWS";
+
+            source = source.Take(table.ItemsPerPage);
+        }
         else
-            return source.Skip((table.Page - 1) * table.ItemsPerPage).Take(table.ItemsPerPage);
+            source = source.Skip((table.Page - 1) * table.ItemsPerPage).Take(table.ItemsPerPage);
+
+        return source.TagWith(tag);
     }
 }

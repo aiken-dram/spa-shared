@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text;
 using Shared.Application.Interfaces;
 
@@ -8,35 +9,6 @@ namespace Shared.Application.Helpers;
 /// </summary>
 public static class DisplayHelper
 {
-    /// <summary>
-    /// Display DateTime value with DateTimeFormat
-    /// </summary>
-    /// <param name="val"></param>
-    /// <returns></returns>
-    public static string ToString(DateTime val, string format = Messages.DateTimeFormat, bool isTimeStamp = false)
-    {
-        if (format == Messages.DateTimeFormat && isTimeStamp)
-            format = Messages.TimestampFormat;
-        return val.ToString(format);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="val"></param>
-    /// <returns></returns>
-    public static string ToString(long val)
-    { return val.ToString(); }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="val"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string ToString(long? val, string NullValue = Messages.NullValue)
-    { return (val.HasValue) ? ToString(val.Value) : NullValue; }
-
     /// <summary>
     /// 
     /// </summary>
@@ -77,24 +49,6 @@ public static class DisplayHelper
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="val"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string Percentage(decimal? val, string NullValue = Messages.NullValue)
-    { return val.HasValue ? val.Value.ToString("0.00") + "%" : NullValue; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="val"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string Currency(decimal? val, string NullValue = Messages.NullValue)
-    { return val.HasValue ? val.Value.ToString("0.00") + Messages.Currency : NullValue; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="Index"></param>
     /// <param name="City"></param>
     /// <param name="Street"></param>
@@ -120,21 +74,19 @@ public static class DisplayHelper
     }
 
     /// <summary>
-    /// 
+    /// DisplayName attribute for class
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="dict"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string FromDictionary(long? id, IList<IDictionary> dict, string NullValue = Messages.NullValue)
-    { return id.HasValue ? dict.First(p => p.Value == id.Value).Text : NullValue; }
+    /// <typeparam name="T">Class</typeparam>
+    /// <returns>DisplayName attribute</returns>
+    public static string GetDisplayName<T>()
+    {
+        var displayName = typeof(T)
+          .GetCustomAttributes(typeof(DisplayNameAttribute), true)
+          .FirstOrDefault() as DisplayNameAttribute;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="val"></param>
-    /// <param name="NullValue"></param>
-    /// <returns></returns>
-    public static string? CurrencyText(decimal? val, string? NullValue = Messages.NullValue)
-    { return val.HasValue ? RuDateAndMoneyConverter.SumText(val.Value) : NullValue; }
+        if (displayName != null)
+            return displayName.DisplayName;
+
+        return "";
+    }
 }

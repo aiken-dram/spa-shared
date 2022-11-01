@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Shared.Infrastructure.Interceptors;
@@ -63,27 +64,41 @@ public class DB9QueryInterceptor : DbCommandInterceptor
     }
 
     /// <summary>
+    /// Find N in FETCH FIRST N ROWS
+    /// </summary>
+    /// <param name="cmd">Db2Command</param>
+    /// <returns>Number of retrieving rows in FETCH FIRST</returns>
+    private static int GetFetchFirst(string cmd)
+    {
+        var regex = @"^-- TABLE FIRST PAGE N(\d+)ROWS";
+        Regex rFetch = new Regex(regex, RegexOptions.IgnoreCase);
+        var matches = rFetch.Matches(cmd);
+        var rows = matches[0].Groups[1].Value;
+        return Convert.ToInt32(rows);
+    }
+
+    /// <summary>
     /// Fixing DbCommand for old IBM DB2 database
     /// </summary>
     /// <param name="command">Db2Command</param>
     private static void ManipulateCommand(DbCommand command)
     {
-        if (command.CommandText.StartsWith("-- FIRST PAGE TABLE", StringComparison.Ordinal))
-        {
-            int fetch = 10;
-            //should prolly use like regex here but mendokusai
-            if (command.CommandText.StartsWith("-- FIRST PAGE TABLE N50", StringComparison.Ordinal))
-                fetch = 50;
-            if (command.CommandText.StartsWith("-- FIRST PAGE TABLE N100", StringComparison.Ordinal))
-                fetch = 100;
-            if (command.CommandText.StartsWith("-- FIRST PAGE TABLE N60000", StringComparison.Ordinal))
-                fetch = 60000;
-            FixFetchFirst(ref command, fetch);
-        }
+        //fix FETCH FIRST ROWS ONLY error in DB9.8
+        var search = "-- TABLE FIRST PAGE N";
+        if (command.CommandText.StartsWith(search, StringComparison.Ordinal))
+            FixFetchFirst(ref command, GetFetchFirst(command.CommandText));
 
         //fix CAST 1 AS SMALLINT to boolean error in DB9.8
-        /*if(command.CommandText.Contains("ELSE CAST(1 AS SMALLINT) END")
-        //    command.CommandText.Replace("", "")/**/
-        //i think it was fixed in some of recent release of DB2 Entity framework package, since couldnt replicate
+        search = "-- TABLE";
+        if (command.CommandText.StartsWith(search, StringComparison.Ordinal))
+        {
+            search = "THEN CAST(1 AS smallint)\r\n    ELSE CAST(0 AS smallint)\r\nEND";
+            if (command.CommandText.Contains(search))
+            {
+                var txt = command.CommandText;
+                var fix = txt.Replace(search, search + " = CAST(1 AS smallint)");
+                command.CommandText = fix;
+            }
+        }
     }
 }

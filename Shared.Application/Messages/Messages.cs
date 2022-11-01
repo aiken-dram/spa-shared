@@ -26,13 +26,9 @@ public static class Messages
     /// </summary>
     public const string NullValue = "missing";
     /// <summary>
-    /// Text to be displayed in case of char boolean true value
+    /// Value is hidden
     /// </summary>
-    public const string CharBooleanTrue = "true";
-    /// <summary>
-    /// Text to be displayed in case of char boolean false value
-    /// </summary>
-    public const string CharBooleanFalse = "false";
+    public const string HiddenValue = "(hidden)";
     /// <summary>
     /// Culture info
     /// </summary>
@@ -49,6 +45,14 @@ public static class Messages
     /// Currency symbol
     /// </summary>
     public const string Currency = "р.";
+    /// <summary>
+    /// Char boolean text for true
+    /// </summary>
+    public const string CharBooleanTrue = "Yes";
+    /// <summary>
+    /// Char boolean text for false
+    /// </summary>
+    public const string CharBooleanFalse = "No";
     #endregion
 
     #region HELPERS
@@ -76,13 +80,17 @@ public static class Messages
     /// Value in field replaced with
     /// </summary>
     public static string HistoryEditValue(string field, object oldVal, object newVal) => $"Value <code>{oldVal}</code> in field <strong>{field}</strong> replaced with <code>{newVal}</code>";
+    #endregion
+
+    #region MODELS
     /// <summary>
     /// Incorrect filter format
     /// </summary>
     public static string IncorrectFilterFormat(string filter) => $"Incorrect filter format: '{filter}'";
+
     /// <summary>
-    /// Filter is empty
+    /// Filter cannot be empty
     /// </summary>
-    public const string EmptyFilter = "Filter is empty";
+    public const string EmptyFilter = "Filter must not be empty";
     #endregion
 }

@@ -1,4 +1,7 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Shared.Application.Exceptions;
+using Shared.Application.Helpers;
 
 namespace Shared.Application.Extensions;
 
@@ -48,5 +51,25 @@ public static class IQueryableExtensions
 
         // query.Where(p => p.{propertyName} == holdpv.v)
         return query.Provider.CreateQuery<T>(whereCallExpression);
+    }
+
+
+    /// <summary>
+    /// Searches query by predicate and returns entity or throws NotFoundException
+    /// </summary>
+    /// <param name="source">this query</param>
+    /// <param name="predicate">search predicate</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="TSource">Type of query's entity</typeparam>
+    /// <returns>Entity</returns>
+    public static async Task<TSource> GetAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        where TSource : class
+    {
+        var res = await source.FirstOrDefaultAsync(predicate, cancellationToken);
+
+        if (res == null)
+            throw new NotFoundException(DisplayHelper.GetDisplayName<TSource>());
+
+        return res;
     }
 }

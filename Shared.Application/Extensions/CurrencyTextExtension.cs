@@ -1,4 +1,4 @@
-namespace Shared.Application.Helpers;
+namespace Shared.Application.Extensions;
 
 /// <summary>
 /// Russian text cases
@@ -39,7 +39,7 @@ public enum TextCase
 /// <summary>
 /// Static class for russian date and money converter
 /// </summary>
-public static class RuDateAndMoneyConverter
+public static class RuDateAndMoneyConverterExtension
 {
     static string zero = "ноль";
     static string firstMale = "один";
@@ -53,66 +53,72 @@ public static class RuDateAndMoneyConverter
 
     static string[] from3till19 =
     {
-                "", "три", "четыре", "пять", "шесть",
-                "семь", "восемь", "девять", "десять", "одиннадцать",
-                "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
-                "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
-            };
+        "", "три", "четыре", "пять", "шесть",
+        "семь", "восемь", "девять", "десять", "одиннадцать",
+        "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
+        "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
+    };
     static string[] from3till19Genetive =
     {
-                "", "трех", "четырех", "пяти", "шести",
-                "семи", "восеми", "девяти", "десяти", "одиннадцати",
-                "двенадцати", "тринадцати", "четырнадцати", "пятнадцати",
-                "шестнадцати", "семнадцати", "восемнадцати", "девятнадцати"
-            };
+        "", "трех", "четырех", "пяти", "шести",
+        "семи", "восеми", "девяти", "десяти", "одиннадцати",
+        "двенадцати", "тринадцати", "четырнадцати", "пятнадцати",
+        "шестнадцати", "семнадцати", "восемнадцати", "девятнадцати"
+    };
     static string[] tens =
     {
-                "", "двадцать", "тридцать", "сорок", "пятьдесят",
-                "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
-            };
+        "", "двадцать", "тридцать", "сорок", "пятьдесят",
+        "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
+    };
     static string[] tensGenetive =
     {
-                "", "двадцати", "тридцати", "сорока", "пятидесяти",
-                "шестидесяти", "семидесяти", "восьмидесяти", "девяноста"
-            };
+        "", "двадцати", "тридцати", "сорока", "пятидесяти",
+        "шестидесяти", "семидесяти", "восьмидесяти", "девяноста"
+    };
     static string[] hundreds =
     {
-                "", "сто", "двести", "триста", "четыреста",
-                "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
-            };
+        "", "сто", "двести", "триста", "четыреста",
+        "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
+    };
     static string[] hundredsGenetive =
     {
-                "", "ста", "двухсот", "трехсот", "четырехсот",
-                "пятисот", "шестисот", "семисот", "восемисот", "девятисот"
-            };
+        "", "ста", "двухсот", "трехсот", "четырехсот",
+        "пятисот", "шестисот", "семисот", "восемисот", "девятисот"
+    };
     static string[] thousands =
     {
-                "", "тысяча", "тысячи", "тысяч"
-            };
+        "", "тысяча", "тысячи", "тысяч"
+    };
     static string[] thousandsAccusative =
     {
-                "", "тысячу", "тысячи", "тысяч"
-            };
+        "", "тысячу", "тысячи", "тысяч"
+    };
     static string[] millions =
     {
-                "", "миллион", "миллиона", "миллионов"
-            };
+        "", "миллион", "миллиона", "миллионов"
+    };
     static string[] billions =
     {
-                "", "миллиард", "миллиарда", "миллиардов"
-            };
+        "", "миллиард", "миллиарда", "миллиардов"
+    };
     static string[] trillions =
     {
-                "", "трилион", "трилиона", "триллионов"
-            };
+        "", "трилион", "трилиона", "триллионов"
+    };
     static string[] rubles =
     {
-                "", "рубль", "рубля", "рублей"
-            };
+        "", "рубль", "рубля", "рублей"
+    };
     static string[] copecks =
     {
-                "", "копейка", "копейки", "копеек"
-            };
+        "", "копейка", "копейки", "копеек"
+    };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static string? CurrencyText(this decimal? val, bool FirstCapital = false, string? NullValue = Messages.NullValue)
+    { return val.HasValue ? val.Value.CurrencyText(FirstCapital) : NullValue; }
 
     /// <summary>
     /// 
@@ -121,14 +127,11 @@ public static class RuDateAndMoneyConverter
     /// <param name="NullValue"></param>
     /// <param name="FirstCapital"></param>
     /// <returns></returns>
-    public static string? SumText(decimal? sum, string? NullValue = null, bool FirstCapital = false)
+    public static string? CurrencyText(this decimal sum, bool FirstCapital = false)
     {
-        if (!sum.HasValue)
-            return NullValue;
-
         //Десять тысяч рублей 67 копеек
-        long rublesAmount = (long)Math.Floor(sum.Value);
-        long copecksAmount = ((long)Math.Round(sum.Value * 100)) % 100;
+        long rublesAmount = (long)Math.Floor(sum);
+        long copecksAmount = ((long)Math.Round(sum * 100)) % 100;
         int lastRublesDigit = lastDigit(rublesAmount);
         int lastCopecksDigit = lastDigit(copecksAmount);
 

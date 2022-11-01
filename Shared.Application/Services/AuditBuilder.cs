@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Shared.Application.Extensions;
-using Shared.Application.Helpers;
 using Shared.Application.Interfaces;
 using Shared.Domain.Attributes;
 using Shared.Domain.Enums;
@@ -27,6 +26,11 @@ public class AuditDataTypeOptions
     /// Dictionary for { Field: "field", Old: "old", "New": "new" } json
     /// </summary>
     public int dataTypeFieldOldNew { get; set; } = 3;
+
+    /// <summary>
+    /// Dictionary for { Field: "field", Operation: "operation", "Value": "value" } json
+    /// </summary>
+    public int dataTypeFieldOperationValue { get; set; } = 4;
 }
 
 public class AuditActionOptions
@@ -76,6 +80,7 @@ public abstract class AuditBuilder : IAuditBuilder
         dataTypeValue = o.DataTypeOptions.dataTypeValue;
         dataTypeFieldValue = o.DataTypeOptions.dataTypeFieldValue;
         dataTypeFieldOldNew = o.DataTypeOptions.dataTypeFieldOldNew;
+        dataTypeFieldOperationValue = o.DataTypeOptions.dataTypeFieldOperationValue;
 
         actionCreate = o.ActionOptions.actionCreate;
         actionEdit = o.ActionOptions.actionEdit;
@@ -86,6 +91,7 @@ public abstract class AuditBuilder : IAuditBuilder
     private readonly int dataTypeValue;
     private readonly int dataTypeFieldValue;
     private readonly int dataTypeFieldOldNew;
+    private readonly int dataTypeFieldOperationValue;
 
     private readonly int actionCreate;
     private readonly int actionEdit;
@@ -130,7 +136,7 @@ public abstract class AuditBuilder : IAuditBuilder
     /// <summary>
     /// Dictionaries in audit
     /// </summary>
-    public Dictionary<string, Dictionary<object, string?>> Dictionaries = new Dictionary<string, Dictionary<object, string?>>();
+    public Dictionary<string, Dictionary<long, string?>> Dictionaries = new Dictionary<string, Dictionary<long, string?>>();
 
     #region AUDIT DATA CONSTRUCTORS 
     public AuditData DataValue(string val)
@@ -162,10 +168,21 @@ public abstract class AuditBuilder : IAuditBuilder
         };
         return IAuditBuilder.Data(obj, dataTypeFieldOldNew);
     }
+
+    public AuditData DataFieldOperationValue(string field, string operation, string value)
+    {
+        var obj = new JsonDataFieldOperationValue
+        {
+            Field = field,
+            Operation = operation,
+            Value = value
+        };
+        return IAuditBuilder.Data(obj, dataTypeFieldOperationValue);
+    }
     #endregion
 
     #region AUDIT DATA FOR PROPERTY AUDIT
-    public async Task<AuditData?> PropertyCreate<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property)
+    public async Task<AuditData?> PropertyCreateAsync<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property)
     {
         //request property
         var r = RequestProperty<TRequest>(property);
@@ -174,17 +191,17 @@ public abstract class AuditBuilder : IAuditBuilder
         if (r != null)
         {
             //request value
-            var rVal = await ToString(request, r, attr);
+            var rVal = await ToStringAsync(request, r, attr);
 
             return DataFieldValue(property.Name, rVal);
         }
         return null;
     }
 
-    public Task<AuditData?> PropertyCreate<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression)
-    => PropertyCreate(entity, request, propertyExpression.GetPropertyInfo());
+    public Task<AuditData?> PropertyCreateAsync<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression)
+    => PropertyCreateAsync(entity, request, propertyExpression.GetPropertyInfo());
 
-    public async Task<AuditData?> PropertyCreate<TEntity>(EntityEntry<TEntity> entry, PropertyInfo property)
+    public async Task<AuditData?> PropertyCreateAsync<TEntity>(EntityEntry<TEntity> entry, PropertyInfo property)
         where TEntity : class
     {
         //request property
@@ -192,17 +209,17 @@ public abstract class AuditBuilder : IAuditBuilder
 
         //current value
         var currentValue = entry.Property(property.Name).CurrentValue;
-        var val = await PropertyToString(currentValue, attr);
+        var val = await PropertyToStringAsync(currentValue, attr);
 
         return DataFieldValue(property.Name, val);
     }
 
-    public async Task<AuditData?> PropertyEdit<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property)
+    public async Task<AuditData?> PropertyEditAsync<TEntity, TRequest>(TEntity entity, TRequest request, PropertyInfo property)
     {
         var attr = GetAuditAttribute(property);
 
         //old (entity) value
-        var oVal = await ToString(entity, property, attr);
+        var oVal = await ToStringAsync(entity, property, attr);
 
         //request property
         var r = RequestProperty<TRequest>(property);
@@ -210,7 +227,7 @@ public abstract class AuditBuilder : IAuditBuilder
         if (r != null)
         {
             //new (request) value
-            var nVal = await ToString(request, r, attr);
+            var nVal = await ToStringAsync(request, r, attr);
 
             //if not equal return AuditData
             if (nVal != oVal)
@@ -219,10 +236,10 @@ public abstract class AuditBuilder : IAuditBuilder
         return null;
     }
 
-    public Task<AuditData?> PropertyEdit<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression)
-    => PropertyEdit(entity, request, propertyExpression.GetPropertyInfo());
+    public Task<AuditData?> PropertyEditAsync<TEntity, TRequest, TProperty>(TEntity entity, TRequest request, Expression<Func<TEntity, TProperty>> propertyExpression)
+    => PropertyEditAsync(entity, request, propertyExpression.GetPropertyInfo());
 
-    private async Task<AuditData?> PropertyEdit<TEntity>(EntityEntry<TEntity> entry, PropertyInfo property)
+    private async Task<AuditData?> PropertyEditAsync<TEntity>(EntityEntry<TEntity> entry, PropertyInfo property)
         where TEntity : class
     {
         var attr = GetAuditAttribute(property);
@@ -230,8 +247,8 @@ public abstract class AuditBuilder : IAuditBuilder
         var originalValue = entry.Property(property.Name).OriginalValue;
         var currentValue = entry.Property(property.Name).CurrentValue;
 
-        var oVal = await PropertyToString(originalValue, attr);
-        var nVal = await PropertyToString(currentValue, attr);
+        var oVal = await PropertyToStringAsync(originalValue, attr);
+        var nVal = await PropertyToStringAsync(currentValue, attr);
 
         if (oVal != nVal)
             return DataFieldOldNew(property.Name, oVal, nVal);
@@ -239,47 +256,54 @@ public abstract class AuditBuilder : IAuditBuilder
         return null;
     }
 
-    public async Task<AuditData> PropertyValue<TEntity>(TEntity entity, PropertyInfo property)
+    public async Task<AuditData> PropertyValueAsync<TEntity>(TEntity entity, PropertyInfo property)
     {
         var attr = GetAuditAttribute(property);
-        var val = await ToString(entity, property, attr);
+        var val = await ToStringAsync(entity, property, attr);
         return DataFieldValue(property.Name, val);
     }
 
-    public Task<AuditData> PropertyValue<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
-    => PropertyValue(entity, propertyExpression.GetPropertyInfo());
+    public Task<AuditData> PropertyValueAsync<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+    => PropertyValueAsync(entity, propertyExpression.GetPropertyInfo());
     #endregion
 
     #region PROPERTY VALUE
-    public abstract Task<Dictionary<object, string?>> GetDictionary(string dictionary);
+    public abstract Task<Dictionary<long, string?>> GetDictionaryAsync(string dictionary);
 
-    public virtual async Task<string> PropertyDictionaryValue(object val, string dictionary)
+    public virtual async Task<string> PropertyDictionaryValueAsync(object val, string dictionary)
     {
         //populate dictionary if missing one with this name
         if (!Dictionaries.ContainsKey(dictionary))
-            Dictionaries.Add(dictionary, await GetDictionary(dictionary));
+            Dictionaries.Add(dictionary, await GetDictionaryAsync(dictionary));
+
+        //might not be long
+        long v = Convert.ToInt64(val);
 
         var dict = Dictionaries[dictionary];
-        if (dict.ContainsKey(val))
-            return dict[val] ?? Messages.NullValue;
+        if (dict.ContainsKey(v))
+            return dict[v] ?? Messages.NullValue;
         else
             return val.ToString() ?? Messages.NullValue;
     }
 
-    public virtual async Task<string> PropertyToString(object? val, AuditAttribute attr)
+    public virtual async Task<string> PropertyToStringAsync(object? val, AuditAttribute attr)
     {
         switch (val)
         {
             case short when attr.Dictionary != null:
             case int when attr.Dictionary != null:
             case long when attr.Dictionary != null:
-                return await PropertyDictionaryValue(val, attr.Dictionary);
+            case Enum when attr.Dictionary != null:
+                return await PropertyDictionaryValueAsync(val, attr.Dictionary);
 
             case string s when attr.IsCharBoolean:
                 return s == CharBoolean.True ? Messages.CharBooleanTrue : Messages.CharBooleanFalse;
 
+            case string when attr.HideValue:
+                return Messages.HiddenValue;
+
             case decimal c when attr.IsCurreny:
-                return DisplayHelper.Currency(c);
+                return c.Currency();
 
             case DateTime t when attr.IsTimeStamp:
                 return t.ToString(Messages.TimestampFormat);
@@ -298,21 +322,21 @@ public abstract class AuditBuilder : IAuditBuilder
     /// <param name="p">PropertyInfo</param>
     /// <param name="attr">AuditAttribute</param>
     /// <returns>String value</returns>
-    private async Task<string> ToString<T>(T obj, PropertyInfo p, AuditAttribute attr)
+    private async Task<string> ToStringAsync<T>(T obj, PropertyInfo p, AuditAttribute attr)
     {
         var val = p.GetValue(obj);
-        return await PropertyToString(val, attr);
+        return await PropertyToStringAsync(val, attr);
     }
     #endregion
 
     #region AUDIT DATA LIST CONSTRUCTORS
-    public async Task<List<AuditData>> EntityData<TEntity>(TEntity entity)
+    public async Task<List<AuditData>> EntityDataAsync<TEntity>(TEntity entity)
     {
         var res = new List<AuditData>();
 
         //loop for all properties with [Audit] attribute
         foreach (var p in AuditProperties<TEntity>())
-            res.Add(await PropertyValue(entity, p));
+            res.Add(await PropertyValueAsync(entity, p));
 
         return res;
     }
@@ -331,21 +355,21 @@ public abstract class AuditBuilder : IAuditBuilder
         return res;
     }
 
-    public async Task<List<AuditData>> EntityEdit<TEntity, TRequest>(TEntity entity, TRequest request)
+    public async Task<List<AuditData>> EntityEditAsync<TEntity, TRequest>(TEntity entity, TRequest request)
     {
         var res = new List<AuditData>();
 
         //loop for all properties with [Audit] attribute
         foreach (var p in AuditProperties<TEntity>())
         {
-            var d = await PropertyEdit(entity, request, p);
+            var d = await PropertyEditAsync(entity, request, p);
             if (d != null)
                 res.Add(d);
         }
         return res;
     }
 
-    private async Task<List<AuditData>> EntryEdit<TEntity>(EntityEntry<TEntity> entry)
+    private async Task<List<AuditData>> EntryEditAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : class
     {
         var res = new List<AuditData>();
@@ -353,28 +377,28 @@ public abstract class AuditBuilder : IAuditBuilder
         //loop for all properties with [Audit] attribute
         foreach (var p in AuditProperties<TEntity>())
         {
-            var d = await PropertyEdit(entry, p);
+            var d = await PropertyEditAsync(entry, p);
             if (d != null)
                 res.Add(d);
         }
         return res;
     }
 
-    public async Task<List<AuditData>> EntityCreate<TEntity, TRequest>(TEntity entity, TRequest request)
+    public async Task<List<AuditData>> EntityCreateAsync<TEntity, TRequest>(TEntity entity, TRequest request)
     {
         var res = new List<AuditData>();
 
         //loop for all properties with [Audit] attribute
         foreach (var p in AuditProperties<TEntity>())
         {
-            var d = await PropertyCreate(entity, request, p);
+            var d = await PropertyCreateAsync(entity, request, p);
             if (d != null)
                 res.Add(d);
         }
         return res;
     }
 
-    private async Task<List<AuditData>> EntryCreate<TEntity>(EntityEntry<TEntity> entry)
+    private async Task<List<AuditData>> EntryCreateAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : class
     {
         var res = new List<AuditData>();
@@ -382,7 +406,7 @@ public abstract class AuditBuilder : IAuditBuilder
         //loop for all properties with [Audit] attribute
         foreach (var p in AuditProperties<TEntity>())
         {
-            var d = await PropertyCreate(entry, p);
+            var d = await PropertyCreateAsync(entry, p);
             if (d != null)
                 res.Add(d);
         }
@@ -400,22 +424,22 @@ public abstract class AuditBuilder : IAuditBuilder
     public Audit Create(AuditableEntity entity, string? message = null)
     => new Audit(entity.AuditIdTarget, actionCreate, null, entity.AuditTargetName, message);
 
-    public async Task<Audit> Create<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
+    public async Task<Audit> CreateAsync<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
     where TEntity : AuditableEntity
     {
         var res = Create((AuditableEntity)entity, message);
         // AuditData
-        res.AddRange(await EntityCreate(entity, request));
+        res.AddRange(await EntityCreateAsync(entity, request));
         return res;
     }
 
-    public async Task<Audit> Create<TEntity>(EntityEntry<TEntity> entry)
+    public async Task<Audit> CreateAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : AuditableEntity
     {
         var res = Create((AuditableEntity)entry.Entity, "AutoAudit");
 
         // AuditData
-        res.AddRange(await EntryCreate(entry));
+        res.AddRange(await EntryCreateAsync(entry));
 
         return res;
     }
@@ -423,21 +447,21 @@ public abstract class AuditBuilder : IAuditBuilder
     public Audit Edit(AuditableEntity entity, string? message = null)
     => new Audit(entity.AuditIdTarget, actionEdit, entity.AuditTargetId, entity.AuditTargetName, message);
 
-    public async Task<Audit> Edit<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
+    public async Task<Audit> EditAsync<TEntity, TRequest>(TEntity entity, TRequest request, string? message = null)
     where TEntity : AuditableEntity
     {
         var res = Edit((AuditableEntity)entity, message);
         // AuditData
-        res.AddRange(await EntityEdit(entity, request));
+        res.AddRange(await EntityEditAsync(entity, request));
         return res;
     }
 
-    public async Task<Audit> Edit<TEntity>(EntityEntry<TEntity> entry)
+    public async Task<Audit> EditAsync<TEntity>(EntityEntry<TEntity> entry)
         where TEntity : AuditableEntity
     {
         var res = Edit((AuditableEntity)entry.Entity, "AutoAudit");
         // AuditData
-        res.AddRange(await EntryEdit(entry));
+        res.AddRange(await EntryEditAsync(entry));
         return res;
     }
 

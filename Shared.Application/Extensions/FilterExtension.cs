@@ -4,12 +4,12 @@ using System.Reflection;
 using Shared.Application.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Shared.Application.Helpers;
+namespace Shared.Application.Extensions;
 
 /// <summary>
 /// Static class for working with expressions
 /// </summary>
-public static partial class ExpressionHelper
+public static partial class FilterExtension
 {
     /// <summary>
     /// Building dynamic predicate from list of filters
@@ -17,7 +17,7 @@ public static partial class ExpressionHelper
     /// <param name="filters">list of filters</param>
     /// <typeparam name="T">type of entity</typeparam>
     /// <returns>predicate expression</returns>
-    public static Expression<Func<T, bool>> BuildPredicates<T>(IEnumerable<TableFilter> filters)
+    public static Expression<Func<T, bool>> BuildPredicates<T>(this IEnumerable<TableFilter> filters)
     {
         var parameter = Expression.Parameter(typeof(T), "x");
 
@@ -155,7 +155,6 @@ public static partial class ExpressionHelper
 
                     var list = Expression.Constant(values);
                     return Expression.Call(list, methodInfo, left);
-                    //need p => values.Contains(p.field) here
                 }
                 return Expression.Constant(true);
             default:

@@ -1,4 +1,4 @@
-namespace Shared.Application.Extensions;
+namespace Shared.Domain.Extensions;
 
 /// <summary>
 /// Extensions for string
