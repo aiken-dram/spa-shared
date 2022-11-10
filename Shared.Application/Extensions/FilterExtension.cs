@@ -95,7 +95,7 @@ public static partial class FilterExtension
                     null);
                 if (efLikeMethod == null)
                     throw new Exception("Could not find 'Like' method in DbFunctionsExtensions");
-                var pattern = Expression.Constant($"%{value}%", typeof(string));
+                var pattern = Expression.Constant(value, typeof(string));
                 return Expression.Call(efLikeMethod,
                 Expression.Property(null, typeof(EF), nameof(EF.Functions)), left, pattern);
             case "date":
