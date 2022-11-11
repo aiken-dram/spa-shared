@@ -88,6 +88,7 @@ public static partial class FilterExtension
             case "EndsWith":
                 return Expression.Call(MakeString(left), comparison, Type.EmptyTypes, Expression.Constant(value, typeof(string)));
             case "like":
+            case "!like":
                 var efLikeMethod = typeof(DbFunctionsExtensions).GetMethod("Like",
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
                     null,
@@ -96,8 +97,12 @@ public static partial class FilterExtension
                 if (efLikeMethod == null)
                     throw new Exception("Could not find 'Like' method in DbFunctionsExtensions");
                 var pattern = Expression.Constant(value, typeof(string));
-                return Expression.Call(efLikeMethod,
-                Expression.Property(null, typeof(EF), nameof(EF.Functions)), left, pattern);
+                if (comparison == "like")
+                    return Expression.Call(efLikeMethod,
+                    Expression.Property(null, typeof(EF), nameof(EF.Functions)), left, pattern);
+                else
+                    return Expression.Not(Expression.Call(efLikeMethod,
+                    Expression.Property(null, typeof(EF), nameof(EF.Functions)), left, pattern));
             case "date":
                 if (!string.IsNullOrEmpty(value))
                 {
@@ -145,6 +150,7 @@ public static partial class FilterExtension
                 return Expression.Constant(true); //wont work i think it woooont
 
             case "in":
+            case "!in":
                 if (value != "null")
                 {
                     var values = value.Split(',').ToList();
@@ -154,7 +160,10 @@ public static partial class FilterExtension
                         throw new Exception("Could not find 'Contains' method in List of string");
 
                     var list = Expression.Constant(values);
-                    return Expression.Call(list, methodInfo, left);
+                    if (comparison == "in")
+                        return Expression.Call(list, methodInfo, left);
+                    else
+                        return Expression.Not(Expression.Call(list, methodInfo, left));
                 }
                 return Expression.Constant(true);
             default:
